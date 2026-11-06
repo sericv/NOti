@@ -1,0 +1,61 @@
+name: NUDGE iOS IPA Build
+
+on:
+  workflow_dispatch:
+
+jobs:
+  build-ios:
+    name: Build NUDGE IPA
+    runs-on: macos-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Install JavaScript dependencies
+        run: npm ci
+
+      - name: Generate native iOS project
+        run: npx expo prebuild --platform ios --no-install
+
+      - name: Install CocoaPods dependencies
+        run: pod install --project-directory=ios
+
+      - name: Build iOS app without code signing
+        run: |
+          xcodebuild \
+            -workspace ios/Nudge.xcworkspace \
+            -scheme Nudge \
+            -configuration Release \
+            -sdk iphoneos \
+            -destination 'generic/platform=iOS' \
+            -derivedDataPath build/ios-derived \
+            CODE_SIGNING_ALLOWED=NO \
+            build
+
+      - name: Package unsigned IPA
+        run: |
+          APP_PATH="$(find build/ios-derived/Build/Products/Release-iphoneos -maxdepth 1 -name '*.app' -print -quit)"
+          if [ -z "$APP_PATH" ]; then
+            echo "Build succeeded but the .app file was not found."
+            exit 1
+          fi
+
+          mkdir -p ipa/Payload
+          cp -R "$APP_PATH" ipa/Payload/
+          cd ipa
+          zip -qr -9 NUDGE-unsigned.ipa Payload
+
+      - name: Upload IPA as workflow artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: NUDGE-unsigned-IPA
+          path: ipa/NUDGE-unsigned.ipa
+          if-no-files-found: error
+          retention-days: 14
