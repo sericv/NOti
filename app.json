@@ -43,7 +43,11 @@
         {
           "enableBackgroundRemoteNotifications": false
         }
-      ]
+      ],
+      ["expo-alternate-app-icons", [
+        "./assets/images/الراجحي.png",
+        "./assets/images/لبيه.png"
+      ]]
     ],
     "experiments": {
       "typedRoutes": true,

@@ -1,6 +1,6 @@
+import { setAlternateAppIcon } from 'expo-alternate-app-icons';
 import { Image } from 'expo-image';
-import { SymbolView } from 'expo-symbols';
-import { Platform, Pressable, ScrollView, StyleSheet } from 'react-native';
+import { Platform, Pressable, ScrollView, StyleSheet, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { ExternalLink } from '@/components/external-link';
@@ -18,6 +18,22 @@ export default function TabTwoScreen() {
     bottom: safeAreaInsets.bottom + BottomTabInset + Spacing.three,
   };
   const theme = useTheme();
+
+  const changeIcon = async (iconName: string | null) => {
+    if (Platform.OS === 'ios') {
+      try {
+        await setAlternateAppIcon(iconName);
+      } catch (e) {
+        console.error(e);
+      }
+    }
+  };
+
+  const icons = [
+    { name: null, label: 'Default', source: require('@/assets/images/icon.png') },
+    { name: 'AlRajhi', label: 'الراجحي', source: require('@/assets/images/الراجحي.png') },
+    { name: 'Libya', label: 'لبيه', source: require('@/assets/images/لبيه.png') },
+  ];
 
   const contentPlatformStyle = Platform.select({
     android: {
@@ -39,26 +55,21 @@ export default function TabTwoScreen() {
       contentContainerStyle={[styles.contentContainer, contentPlatformStyle]}>
       <ThemedView style={styles.container}>
         <ThemedView style={styles.titleContainer}>
-          <ThemedText type="subtitle">Explore</ThemedText>
-          <ThemedText style={styles.centerText} themeColor="textSecondary">
-            This starter app includes example{'\n'}code to help you get started.
-          </ThemedText>
-
-          <ExternalLink href="https://docs.expo.dev" asChild>
-            <Pressable style={({ pressed }) => pressed && styles.pressed}>
-              <ThemedView type="backgroundElement" style={styles.linkButton}>
-                <ThemedText type="link">Expo documentation</ThemedText>
-                <SymbolView
-                  tintColor={theme.text}
-                  name={{ ios: 'arrow.up.right.square', android: 'link', web: 'link' }}
-                  size={12}
-                />
-              </ThemedView>
-            </Pressable>
-          </ExternalLink>
+          <ThemedText type="subtitle">Settings</ThemedText>
         </ThemedView>
 
         <ThemedView style={styles.sectionsWrapper}>
+          <Collapsible title="App Icon">
+            <View style={styles.iconRow}>
+              {icons.map((icon) => (
+                <Pressable key={icon.label} onPress={() => changeIcon(icon.name)} style={styles.iconItem}>
+                  <Image source={icon.source} style={styles.iconImage} />
+                  <ThemedText type="small">{icon.label}</ThemedText>
+                </Pressable>
+              ))}
+            </View>
+          </Collapsible>
+
           <Collapsible title="File-based routing">
             <ThemedText type="small">
               This app has two screens: <ThemedText type="code">src/app/index.tsx</ThemedText> and{' '}
@@ -176,5 +187,20 @@ const styles = StyleSheet.create({
     width: 100,
     height: 100,
     alignSelf: 'center',
+  },
+  iconRow: {
+    flexDirection: 'row',
+    gap: Spacing.four,
+    justifyContent: 'space-around',
+    paddingVertical: Spacing.two,
+  },
+  iconItem: {
+    alignItems: 'center',
+    gap: Spacing.one,
+  },
+  iconImage: {
+    width: 64,
+    height: 64,
+    borderRadius: 14,
   },
 });

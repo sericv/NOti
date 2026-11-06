@@ -61,12 +61,15 @@ export function CreateReminder({ onSubmit, submitting }: Props) {
         {t('note')}
       </ThemedText>
       <TextInput
-        style={inputStyle}
+        style={[inputStyle, styles.bodyInput]}
         value={body}
         onChangeText={setBody}
         placeholder={t('notePlaceholder')}
         placeholderTextColor={theme.textSecondary}
-        returnKeyType="done"
+        multiline
+        numberOfLines={3}
+        textAlignVertical="top"
+        returnKeyType="default"
       />
 
       <ThemedText type="smallBold" style={styles.label}>
@@ -136,6 +139,10 @@ const styles = StyleSheet.create({
     paddingHorizontal: Spacing.three,
     paddingVertical: Spacing.two + 2,
     fontSize: 16,
+  },
+  bodyInput: {
+    minHeight: 96,
+    maxHeight: 200,
   },
   remindRow: {
     flexDirection: 'row',
