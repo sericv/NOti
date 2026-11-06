@@ -1,4 +1,3 @@
-import { setAlternateAppIcon } from 'expo-alternate-app-icons';
 import { Image } from 'expo-image';
 import { Platform, Pressable, ScrollView, StyleSheet, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -10,6 +9,7 @@ import { Collapsible } from '@/components/ui/collapsible';
 import { WebBadge } from '@/components/web-badge';
 import { BottomTabInset, MaxContentWidth, Spacing } from '@/constants/theme';
 import { useTheme } from '@/hooks/use-theme';
+import { isExpoGo, setAlternateAppIconSafe } from '@/services/app-icon';
 
 export default function TabTwoScreen() {
   const safeAreaInsets = useSafeAreaInsets();
@@ -20,13 +20,7 @@ export default function TabTwoScreen() {
   const theme = useTheme();
 
   const changeIcon = async (iconName: string | null) => {
-    if (Platform.OS === 'ios') {
-      try {
-        await setAlternateAppIcon(iconName);
-      } catch (e) {
-        console.error(e);
-      }
-    }
+    await setAlternateAppIconSafe(iconName);
   };
 
   const icons = [
@@ -68,6 +62,11 @@ export default function TabTwoScreen() {
                 </Pressable>
               ))}
             </View>
+            {isExpoGo && (
+              <ThemedText type="small" themeColor="textSecondary" style={styles.expoGoNote}>
+                تغيير الأيقونة يتطلب بناء نسخة أصلية (Native Build) ولا يعمل داخل Expo Go.
+              </ThemedText>
+            )}
           </Collapsible>
 
           <Collapsible title="File-based routing">
@@ -202,5 +201,9 @@ const styles = StyleSheet.create({
     width: 64,
     height: 64,
     borderRadius: 14,
+  },
+  expoGoNote: {
+    textAlign: 'center',
+    paddingTop: Spacing.two,
   },
 });

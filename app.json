@@ -44,10 +44,27 @@
           "enableBackgroundRemoteNotifications": false
         }
       ],
-      ["expo-alternate-app-icons", [
-        "./assets/images/الراجحي.png",
-        "./assets/images/لبيه.png"
-      ]]
+      [
+        "expo-alternate-app-icons",
+        [
+          {
+            "name": "AlRajhi",
+            "ios": "./assets/images/الراجحي.png",
+            "android": {
+              "foregroundImage": "./assets/images/الراجحي.png",
+              "backgroundColor": "#FFFFFF"
+            }
+          },
+          {
+            "name": "Libya",
+            "ios": "./assets/images/لبيه.png",
+            "android": {
+              "foregroundImage": "./assets/images/لبيه.png",
+              "backgroundColor": "#FFFFFF"
+            }
+          }
+        ]
+      ]
     ],
     "experiments": {
       "typedRoutes": true,
