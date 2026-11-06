@@ -4,11 +4,11 @@
     "slug": "Nudge",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/images/icon.png",
+    "icon": "./assets/images/الراجحي.png",
     "scheme": "nudge",
     "userInterfaceStyle": "automatic",
     "ios": {
-      "icon": "./assets/expo.icon",
+      "icon": "./assets/images/الراجحي.png",
       "bundleIdentifier": "com.falah.nudge",
       "infoPlist": {
         "ITSAppUsesNonExemptEncryption": false
@@ -47,14 +47,6 @@
       [
         "expo-alternate-app-icons",
         [
-          {
-            "name": "AlRajhi",
-            "ios": "./assets/images/الراجحي.png",
-            "android": {
-              "foregroundImage": "./assets/images/الراجحي.png",
-              "backgroundColor": "#FFFFFF"
-            }
-          },
           {
             "name": "Libya",
             "ios": "./assets/images/لبيه.png",

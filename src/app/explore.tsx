@@ -24,8 +24,7 @@ export default function TabTwoScreen() {
   };
 
   const icons = [
-    { name: null, label: 'Default', source: require('@/assets/images/icon.png') },
-    { name: 'AlRajhi', label: 'الراجحي', source: require('@/assets/images/الراجحي.png') },
+    { name: null, label: 'Default', source: require('@/assets/images/الراجحي.png') },
     { name: 'Libya', label: 'لبيه', source: require('@/assets/images/لبيه.png') },
   ];
 
