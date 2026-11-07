@@ -1,4 +1,5 @@
 import { Image } from 'expo-image';
+import { useEffect, useState } from 'react';
 import { Platform, Pressable, ScrollView, StyleSheet, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
@@ -9,7 +10,17 @@ import { Collapsible } from '@/components/ui/collapsible';
 import { WebBadge } from '@/components/web-badge';
 import { BottomTabInset, MaxContentWidth, Spacing } from '@/constants/theme';
 import { useTheme } from '@/hooks/use-theme';
-import { isExpoGo, setAlternateAppIconSafe } from '@/services/app-icon';
+import { lang, t } from '@/i18n/strings';
+import {
+  APP_ICONS,
+  AppIconId,
+  AppIconOption,
+  getSavedAppIconId,
+  isExpoGo,
+  switchAppIcon,
+} from '@/services/app-icon';
+
+const ACTIVE_COLOR = '#007AFF';
 
 export default function TabTwoScreen() {
   const safeAreaInsets = useSafeAreaInsets();
@@ -19,14 +30,19 @@ export default function TabTwoScreen() {
   };
   const theme = useTheme();
 
-  const changeIcon = async (iconName: string | null) => {
-    await setAlternateAppIconSafe(iconName);
-  };
+  const [selectedIconId, setSelectedIconId] = useState<AppIconId>('alrajhi');
 
-  const icons = [
-    { name: null, label: 'Default', source: require('@/assets/images/الراجحي.png') },
-    { name: 'Libya', label: 'لبيه', source: require('@/assets/images/لبيه.png') },
-  ];
+  useEffect(() => {
+    getSavedAppIconId().then(setSelectedIconId);
+  }, []);
+
+  const handleSelectIcon = async (icon: AppIconOption) => {
+    if (selectedIconId === icon.id) return;
+    const success = await switchAppIcon(icon);
+    if (success) {
+      setSelectedIconId(icon.id);
+    }
+  };
 
   const contentPlatformStyle = Platform.select({
     android: {
@@ -52,18 +68,64 @@ export default function TabTwoScreen() {
         </ThemedView>
 
         <ThemedView style={styles.sectionsWrapper}>
-          <Collapsible title="App Icon">
+          <Collapsible title={t('appIcon')}>
             <View style={styles.iconRow}>
-              {icons.map((icon) => (
-                <Pressable key={icon.label} onPress={() => changeIcon(icon.name)} style={styles.iconItem}>
-                  <Image source={icon.source} style={styles.iconImage} />
-                  <ThemedText type="small">{icon.label}</ThemedText>
-                </Pressable>
-              ))}
+              {APP_ICONS.map((icon) => {
+                const isSelected = selectedIconId === icon.id;
+                const label = lang === 'ar' ? icon.labelAr : icon.labelEn;
+                const typeLabel = icon.isPrimary
+                  ? t('primaryIconBadge')
+                  : t('alternateIconBadge');
+
+                return (
+                  <Pressable
+                    key={icon.id}
+                    onPress={() => handleSelectIcon(icon)}
+                    style={[
+                      styles.iconCard,
+                      { backgroundColor: theme.backgroundElement },
+                      isSelected && [styles.iconCardSelected, { borderColor: ACTIVE_COLOR }],
+                    ]}
+                    accessibilityRole="button"
+                    accessibilityLabel={`${label} - ${isSelected ? t('active') : ''}`}
+                    accessibilityState={{ selected: isSelected }}>
+                    <View style={styles.iconImageWrapper}>
+                      <Image source={icon.source} style={styles.iconImage} contentFit="cover" />
+                      {isSelected && (
+                        <View style={[styles.checkBadge, { backgroundColor: ACTIVE_COLOR }]}>
+                          <ThemedText style={styles.checkText}>✓</ThemedText>
+                        </View>
+                      )}
+                    </View>
+                    <ThemedText
+                      type={isSelected ? 'smallBold' : 'small'}
+                      style={styles.iconTitle}>
+                      {label}
+                    </ThemedText>
+                    <ThemedText
+                      type="small"
+                      themeColor={isSelected ? 'text' : 'textSecondary'}
+                      style={[styles.iconSubtitle, isSelected && { color: ACTIVE_COLOR }]}>
+                      {isSelected ? `● ${t('active')}` : typeLabel}
+                    </ThemedText>
+                  </Pressable>
+                );
+              })}
             </View>
+
+            <ThemedText
+              type="small"
+              themeColor="textSecondary"
+              style={styles.iconNotice}>
+              {t('iconNotificationNote')}
+            </ThemedText>
+
             {isExpoGo && (
-              <ThemedText type="small" themeColor="textSecondary" style={styles.expoGoNote}>
-                تغيير الأيقونة يتطلب بناء نسخة أصلية (Native Build) ولا يعمل داخل Expo Go.
+              <ThemedText
+                type="small"
+                themeColor="textSecondary"
+                style={styles.expoGoNote}>
+                {t('expoGoIconNote')}
               </ThemedText>
             )}
           </Collapsible>
@@ -188,21 +250,66 @@ const styles = StyleSheet.create({
   },
   iconRow: {
     flexDirection: 'row',
-    gap: Spacing.four,
-    justifyContent: 'space-around',
+    gap: Spacing.three,
+    justifyContent: 'center',
     paddingVertical: Spacing.two,
   },
-  iconItem: {
+  iconCard: {
     alignItems: 'center',
+    paddingVertical: Spacing.three,
+    paddingHorizontal: Spacing.three,
+    borderRadius: Spacing.three,
+    borderWidth: 2,
+    borderColor: 'transparent',
+    minWidth: 124,
     gap: Spacing.one,
   },
+  iconCardSelected: {
+    borderWidth: 2,
+  },
+  iconImageWrapper: {
+    position: 'relative',
+  },
   iconImage: {
-    width: 64,
-    height: 64,
-    borderRadius: 14,
+    width: 72,
+    height: 72,
+    borderRadius: 16,
+  },
+  checkBadge: {
+    position: 'absolute',
+    top: -5,
+    right: -5,
+    width: 22,
+    height: 22,
+    borderRadius: 11,
+    justifyContent: 'center',
+    alignItems: 'center',
+    borderWidth: 2,
+    borderColor: '#FFFFFF',
+  },
+  checkText: {
+    color: '#FFFFFF',
+    fontSize: 12,
+    fontWeight: 'bold',
+    lineHeight: 14,
+  },
+  iconTitle: {
+    marginTop: Spacing.one,
+    textAlign: 'center',
+  },
+  iconSubtitle: {
+    fontSize: 11,
+    textAlign: 'center',
+  },
+  iconNotice: {
+    textAlign: 'center',
+    paddingHorizontal: Spacing.two,
+    paddingTop: Spacing.two,
+    lineHeight: 18,
   },
   expoGoNote: {
     textAlign: 'center',
     paddingTop: Spacing.two,
+    lineHeight: 18,
   },
 });

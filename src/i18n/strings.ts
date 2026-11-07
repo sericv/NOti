@@ -35,6 +35,15 @@ const resources = {
     hour: 'hour',
     day: 'day',
     days: 'days',
+    appIcon: 'App Icon',
+    alRajhi: 'Al Rajhi',
+    labayh: 'Labayh',
+    active: 'Active',
+    primaryIconBadge: 'Primary',
+    alternateIconBadge: 'Alternate',
+    expoGoIconNote: 'Changing the icon requires a Native Build and does not work inside Expo Go.',
+    iconNotificationNote:
+      'Note: On iOS, notifications always display the primary icon (Al Rajhi) per Apple system design.',
   },
   ar: {
     appName: 'نَدج',
@@ -64,6 +73,15 @@ const resources = {
     hour: 'ساعة',
     day: 'يوم',
     days: 'أيام',
+    appIcon: 'أيقونة التطبيق',
+    alRajhi: 'الراجحي',
+    labayh: 'لبيه',
+    active: 'مفعّلة',
+    primaryIconBadge: 'أساسية',
+    alternateIconBadge: 'بديلة',
+    expoGoIconNote: 'تغيير الأيقونة يتطلب بناء نسخة أصلية (Native Build) ولا يعمل داخل Expo Go.',
+    iconNotificationNote:
+      'ملاحظة: في نظام iOS، تظهر الأيقونة الأساسية (الراجحي) دائماً بجانب الإشعارات بحسب قيود Apple.',
   },
 } as const;
 
